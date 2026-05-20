@@ -1,5 +1,6 @@
 import express from "express";
 import cors from "cors";
+import { authRoutes } from "./modules/auth/auth.route";
 
 const app = express();
 
@@ -12,5 +13,7 @@ app.get("/", (req, res) => {
         message: "LEVEL  2 assignment 2",
     });
 });
+
+app.use("/api/auth", authRoutes);
 
 export default app;
