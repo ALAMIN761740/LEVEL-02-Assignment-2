@@ -1,10 +1,13 @@
 import { type Request, type Response } from "express";
+
 import { issueService } from "./issue.service";
 import { catchAsync } from "../../utils/catchAsync";
+import { sendResponse } from "../../utils/sendResponse";
 
 const createIssue = catchAsync(
     async (req: Request, res: Response) => {
-        const { title, description, type } = req.body;
+        const { title, description, type } =
+            req.body;
 
         if (!title || !description || !type) {
             throw new Error("All fields are required");
@@ -33,11 +36,16 @@ const createIssue = catchAsync(
 
         const result =
             await issueService.createIssue(
-                { title, description, type },
+                {
+                    title,
+                    description,
+                    type,
+                },
                 reporterId
             );
 
-        res.status(201).json({
+        sendResponse(res, {
+            statusCode: 201,
             success: true,
             message: "Issue created successfully",
             data: result,
@@ -61,7 +69,8 @@ const getAllIssues = catchAsync(
                 status
             );
 
-        res.status(200).json({
+        sendResponse(res, {
+            statusCode: 200,
             success: true,
             data: result,
         });
@@ -75,7 +84,8 @@ const getSingleIssue = catchAsync(
         const result =
             await issueService.getSingleIssue(issueId);
 
-        res.status(200).json({
+        sendResponse(res, {
+            statusCode: 200,
             success: true,
             data: result,
         });
@@ -93,7 +103,8 @@ const updateIssue = catchAsync(
                 req.user
             );
 
-        res.status(200).json({
+        sendResponse(res, {
+            statusCode: 200,
             success: true,
             message: "Issue updated successfully",
             data: result,
@@ -110,7 +121,8 @@ const deleteIssue = catchAsync(
             req.user.role
         );
 
-        res.status(200).json({
+        sendResponse(res, {
+            statusCode: 200,
             success: true,
             message: "Issue deleted successfully",
         });
