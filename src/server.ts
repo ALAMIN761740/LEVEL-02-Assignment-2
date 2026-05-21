@@ -1,23 +1,38 @@
 import app from "./app";
 import { pool } from "./db";
 import { initDB } from "./db/init";
+import dotenv from "dotenv";
 
-const PORT = 5000;
+dotenv.config();
+
+const PORT = process.env.PORT || 5000;
 
 const startServer = async () => {
     try {
-        await pool.query("SELECT NOW()");
+        if (process.env.DATABASE_URL || process.env.CONNECTION_STRING) {
+            await pool.query("SELECT NOW()");
+            console.log("Database connected");
 
-        console.log("Database connected");
+            await initDB();
+        } else {
+            console.log("No DATABASE_URL or CONNECTION_STRING found — skipping DB connection");
+        }
 
-        await initDB();
-
-        app.listen(PORT, () => {
-            console.log(`Server running on port ${PORT}`);
-        });
+        if (!process.env.VERCEL) {
+            app.listen(PORT, () => {
+                console.log(`Server running on port ${PORT}`);
+            });
+        }
     } catch (error) {
-        console.log(error);
+        console.error(error);
     }
 };
 
-startServer();
+if (!process.env.VERCEL) {
+    startServer();
+}
+
+export default app;
+// Ensure CommonJS consumers (like @vercel/node) can use the exported app
+// @ts-ignore
+(module as any).exports = app;

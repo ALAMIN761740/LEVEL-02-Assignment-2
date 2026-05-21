@@ -23,6 +23,13 @@ export const auth = (
     try {
         const token = req.headers.authorization;
 
+        if (!process.env.JWT_SECRET) {
+            return res.status(500).json({
+                success: false,
+                message: "Server misconfiguration: JWT_SECRET is not set",
+            });
+        }
+
         if (!token) {
             return res.status(401).json({
                 success: false,
@@ -30,10 +37,7 @@ export const auth = (
             });
         }
 
-        const decoded = jwt.verify(
-            token,
-            process.env.JWT_SECRET as string
-        ) as JwtPayload;
+        const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as JwtPayload;
 
         req.user = decoded;
 
