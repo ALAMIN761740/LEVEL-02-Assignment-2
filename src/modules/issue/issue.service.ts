@@ -151,6 +151,103 @@ const getSingleIssue = async (id: number) => {
 
 
 
+const updateIssue = async (
+    issueId: number,
+    payload: {
+        title?: string;
+        description?: string;
+        type?: "bug" | "feature_request";
+        status?: "open" | "in_progress" | "resolved";
+    },
+    user: {
+        id: number;
+        role: string;
+    }
+) => {
+    // find issue
+    const issueResult = await pool.query(
+        `
+      SELECT * FROM issues
+      WHERE id = $1
+    `,
+        [issueId]
+    );
+
+    const issue = issueResult.rows[0];
+
+    // issue not found
+    if (!issue) {
+        throw new Error("Issue not found");
+    }
+
+    // contributor rules
+    if (user.role === "contributor") {
+        // own issue check
+        if (issue.reporter_id !== user.id) {
+            throw new Error(
+                "You can only update your own issues"
+            );
+        }
+
+        // status check
+        if (issue.status !== "open") {
+            throw new Error(
+                "You cannot update non-open issues"
+            );
+        }
+    }
+
+    // dynamic fields
+    const updates: string[] = [];
+    const values: (
+        | string
+        | number
+    )[] = [];
+
+    if (payload.title) {
+        values.push(payload.title);
+        updates.push(`title = $${values.length}`);
+    }
+
+    if (payload.description) {
+        values.push(payload.description);
+        updates.push(`description = $${values.length}`);
+    }
+
+    if (payload.type) {
+        values.push(payload.type);
+        updates.push(`type = $${values.length}`);
+    }
+
+    // maintainer can update status
+    if (
+        payload.status &&
+        user.role === "maintainer"
+    ) {
+        values.push(payload.status);
+        updates.push(`status = $${values.length}`);
+    }
+
+    // updated_at
+    updates.push(`updated_at = CURRENT_TIMESTAMP`);
+
+    // issue id
+    values.push(issueId);
+
+    const query = `
+    UPDATE issues
+    SET ${updates.join(", ")}
+    WHERE id = $${values.length}
+    RETURNING *
+  `;
+
+    const result = await pool.query(query, values);
+
+    return result.rows[0];
+};
+
+
+
 
 
 
@@ -163,4 +260,5 @@ export const issueService = {
     createIssue,
     getAllIssues,
     getSingleIssue,
+    updateIssue,
 };

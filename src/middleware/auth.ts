@@ -1,11 +1,19 @@
-import { type NextFunction, type Request, type Response } from "express";
-
-
+import {
+    type NextFunction,
+    type Request,
+    type Response,
+} from "express";
 
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 
 dotenv.config();
+
+interface JwtPayload {
+    id: number;
+    name: string;
+    role: string;
+}
 
 export const auth = (
     req: Request,
@@ -25,9 +33,9 @@ export const auth = (
         const decoded = jwt.verify(
             token,
             process.env.JWT_SECRET as string
-        );
+        ) as JwtPayload;
 
-        req.user = decoded as any;
+        req.user = decoded;
 
         next();
     } catch (error) {

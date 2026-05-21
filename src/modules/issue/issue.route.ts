@@ -11,6 +11,7 @@ const router = express.Router();
 router.post("/", auth, issueController.createIssue);
 router.get("/", issueController.getAllIssues);
 router.get("/:id", issueController.getSingleIssue);
+router.patch("/:id", auth, issueController.updateIssue);
 
 
 
