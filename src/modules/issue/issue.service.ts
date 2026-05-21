@@ -1,5 +1,8 @@
 import { pool } from "../../db";
 
+
+
+
 const createIssue = async (
     payload: {
         title: string;
@@ -21,6 +24,12 @@ const createIssue = async (
 
     return result.rows[0];
 };
+
+
+
+
+
+
 
 const getAllIssues = async (
     sort: string,
@@ -63,8 +72,11 @@ const getAllIssues = async (
         ...new Set(issues.map((issue) => issue.reporter_id)),
     ];
 
-    // fetch reporters separately
-    let reporters: any[] = [];
+    let reporters: {
+        id: number;
+        name: string;
+        role: string;
+    }[] = [];
 
     if (reporterIds.length > 0) {
         const reporterQuery = `
@@ -93,7 +105,62 @@ const getAllIssues = async (
     return finalIssues;
 };
 
+
+
+
+
+
+const getSingleIssue = async (id: number) => {
+    // fetch issue
+    const issueResult = await pool.query(
+        `
+      SELECT * FROM issues
+      WHERE id = $1
+    `,
+        [id]
+    );
+
+    const issue = issueResult.rows[0];
+
+    // issue not found
+    if (!issue) {
+        throw new Error("Issue not found");
+    }
+
+    // fetch reporter
+    const reporterResult = await pool.query(
+        `
+      SELECT id, name, role
+      FROM users
+      WHERE id = $1
+    `,
+        [issue.reporter_id]
+    );
+
+    const reporter = reporterResult.rows[0];
+
+    // merge data
+    return {
+        ...issue,
+        reporter,
+    };
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 export const issueService = {
     createIssue,
     getAllIssues,
+    getSingleIssue,
 };

@@ -13,6 +13,30 @@ const createIssue = async (req: Request, res: Response) => {
             });
         }
 
+        if (description.length < 20) {
+            return res.status(400).json({
+                success: false,
+                message: "Description must be at least 20 characters",
+            });
+        }
+
+        if (title.length > 150) {
+            return res.status(400).json({
+                success: false,
+                message: "Title cannot exceed 150 characters",
+            });
+        }
+
+        if (
+            type !== "bug" &&
+            type !== "feature_request"
+        ) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid issue type",
+            });
+        }
+
         const reporterId = req.user.id;
 
         const result = await issueService.createIssue(
@@ -33,6 +57,11 @@ const createIssue = async (req: Request, res: Response) => {
         });
     }
 };
+
+
+
+
+
 
 
 
@@ -69,6 +98,26 @@ const getAllIssues = async (req: Request, res: Response) => {
 
 
 
+const getSingleIssue = async (req: Request, res: Response) => {
+    try {
+        const issueId = Number(req.params.id);
+
+        const result = await issueService.getSingleIssue(issueId);
+
+        res.status(200).json({
+            success: true,
+            data: result,
+        });
+    } catch (error) {
+        res.status(404).json({
+            success: false,
+            message:
+                error instanceof Error ? error.message : "Something went wrong",
+        });
+    }
+};
+
+
 
 
 
@@ -77,4 +126,5 @@ const getAllIssues = async (req: Request, res: Response) => {
 export const issueController = {
     createIssue,
     getAllIssues,
+    getSingleIssue,
 };
