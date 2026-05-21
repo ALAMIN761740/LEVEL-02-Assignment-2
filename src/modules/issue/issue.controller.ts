@@ -5,7 +5,7 @@ const createIssue = async (req: Request, res: Response) => {
     try {
         const { title, description, type } = req.body;
 
-        // basic validation
+
         if (!title || !description || !type) {
             return res.status(400).json({
                 success: false,
@@ -34,6 +34,47 @@ const createIssue = async (req: Request, res: Response) => {
     }
 };
 
+
+
+const getAllIssues = async (req: Request, res: Response) => {
+    try {
+        const sort = (req.query.sort as string) || "newest";
+
+        const type = req.query.type as string;
+
+        const status = req.query.status as string;
+
+        const result = await issueService.getAllIssues(
+            sort,
+            type,
+            status
+        );
+
+        res.status(200).json({
+            success: true,
+            data: result,
+        });
+    } catch (error) {
+        res.status(400).json({
+            success: false,
+            message:
+                error instanceof Error ? error.message : "Something went wrong",
+        });
+    }
+};
+
+
+
+
+
+
+
+
+
+
+
+
 export const issueController = {
     createIssue,
+    getAllIssues,
 };
