@@ -1,6 +1,6 @@
 import bcrypt from "bcrypt";
 import { pool } from "../../db";
-import type { IUser } from "./auth.interface";
+import type { IUser } from "./user.interface";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 

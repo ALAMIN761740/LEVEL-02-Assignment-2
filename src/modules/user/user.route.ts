@@ -1,6 +1,5 @@
 import express from "express";
-import { authController } from "./auth.controller";
-
+import { authController } from "./user.controller";
 
 
 
@@ -8,10 +7,8 @@ const router = express.Router();
 
 
 
-
 router.post("/signup", authController.signupUser);
 router.post("/login", authController.loginUser);
-
 
 
 
