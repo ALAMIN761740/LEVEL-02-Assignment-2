@@ -13,34 +13,60 @@ const createIssue = async (payload: IIssuePayload, reporterId: number) => {
 };
 
 const fetchIssues = async (sort: string, type?: string, status?: string) => {
-    let query = `SELECT * FROM issues`;
-    const conditions: string[] = [];
-    const values: (string | number)[] = [];
+    let query = `SELECT * FROM issues WHERE 1=1`;
+    const values: any[] = [];
 
     if (type) {
         values.push(type);
-        conditions.push(`type = $${values.length}`);
+        query += ` AND type = $${values.length}`;
     }
 
     if (status) {
         values.push(status);
-        conditions.push(`status = $${values.length}`);
+        query += ` AND status = $${values.length}`;
     }
 
-    if (conditions.length > 0) {
-        query += ` WHERE ${conditions.join(" AND ")}`;
+    if (sort === "oldest") {
+        query += ` ORDER BY created_at ASC`;
+    } else {
+        query += ` ORDER BY created_at DESC`;
     }
-
-    if (sort === "oldest") query += ` ORDER BY created_at ASC`;
-    else query += ` ORDER BY created_at DESC`;
 
     const result = await pool.query(query, values);
-    return result.rows as IIssue[];
+    const issues = result.rows as any[];
+
+    const reporterIds = Array.from(new Set(issues.map((i) => i.reporter_id))).filter(Boolean);
+    let reporters: { id: number; name: string; role: string }[] = [];
+    if (reporterIds.length > 0) {
+        const r = await pool.query(`SELECT id, name, role FROM users WHERE id = ANY($1)`, [reporterIds]);
+        reporters = r.rows;
+    }
+
+    return issues.map((issue) => {
+        const reporter = reporters.find((u) => u.id === issue.reporter_id) || { id: issue.reporter_id, name: null, role: null };
+        return {
+            ...issue,
+            reporter_id: reporter.id,
+            reporter_name: reporter.name,
+            reporter_role: reporter.role,
+        };
+    });
 };
 
 const fetchIssueById = async (id: number) => {
     const result = await pool.query(`SELECT * FROM issues WHERE id = $1`, [id]);
-    return result.rows[0] as IIssue | undefined;
+    const issue = result.rows[0];
+    if (!issue) return null;
+
+    const r = await pool.query(`SELECT id, name, role FROM users WHERE id = $1`, [issue.reporter_id]);
+    const reporter = r.rows[0];
+
+    return {
+        ...issue,
+        reporter_id: reporter?.id,
+        reporter_name: reporter?.name,
+        reporter_role: reporter?.role,
+    };
 };
 
 const fetchUsersByIds = async (ids: number[]) => {

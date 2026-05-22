@@ -1,6 +1,6 @@
 import express from "express";
 import { issueController } from "./issue.controller";
-import { auth } from "../../middleware/user";
+import { auth } from "../../middleware/auth";
 
 
 
@@ -12,7 +12,8 @@ router.post("/", auth, issueController.createIssue);
 router.get("/", issueController.getAllIssues);
 router.get("/:id", issueController.getSingleIssue);
 router.patch("/:id", auth, issueController.updateIssue);
-router.delete("/:id", auth, issueController.deleteIssue);
+// cast factory middleware to `any` to satisfy Express typings
+router.delete("/:id", (auth('maintainer') as unknown) as any, issueController.deleteIssue);
 
 
 

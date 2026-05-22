@@ -18,8 +18,8 @@ export interface IIssue {
     updated_at: string;
     reporter?: {
         id: number;
-        name: string;
-        role: string;
+        reporter_name: string;
+        reporter_role: string;
     } | null;
 }
 

@@ -1,8 +1,8 @@
 import { pool } from "./index";
 
 export const initDB = async () => {
-    try {
-        await pool.query(`
+  try {
+    await pool.query(`
       CREATE TABLE IF NOT EXISTS users (
         id SERIAL PRIMARY KEY,
         name VARCHAR(100) NOT NULL,
@@ -14,7 +14,7 @@ export const initDB = async () => {
       )
     `);
 
-        await pool.query(`
+    await pool.query(`
       CREATE TABLE IF NOT EXISTS issues (
         id SERIAL PRIMARY KEY,
         title VARCHAR(150) NOT NULL,
@@ -27,8 +27,8 @@ export const initDB = async () => {
       )
     `);
 
-        console.log("Tables created successfully");
-    } catch (error) {
-        console.log(error);
-    }
+    console.log("Tables created successfully");
+  } catch (error) {
+    console.log(error);
+  }
 };

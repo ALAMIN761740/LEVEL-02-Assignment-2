@@ -3,6 +3,7 @@ import { pool } from "../../db";
 import type { IUser } from "./user.interface";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
+import { AppError } from "../../utils/AppError";
 
 dotenv.config();
 
@@ -15,7 +16,7 @@ const signupUser = async (payload: IUser) => {
     );
 
     if (existingUser.rows.length > 0) {
-        throw new Error("Email already exists");
+        throw new AppError(400, "Email already exists");
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -46,7 +47,7 @@ const loginUser = async (payload: {
     const user = userResult.rows[0];
 
     if (!user) {
-        throw new Error("User not found");
+        throw new AppError(404, "User not found");
     }
 
     const isPasswordMatched = await bcrypt.compare(
@@ -55,7 +56,7 @@ const loginUser = async (payload: {
     );
 
     if (!isPasswordMatched) {
-        throw new Error("Invalid password");
+        throw new AppError(401, "Invalid password");
     }
 
     const token = jwt.sign(
