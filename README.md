@@ -1,230 +1,370 @@
 # Issue Tracker API
 
-A secure and scalable Issue Tracker REST API built with TypeScript, Express.js, PostgreSQL, and JWT authentication. This project matches the Level-2 assignment requirements: modular structure, raw SQL queries via `pg` pool, role-based permissions, and Vercel deployment support.
+A secure and scalable Issue Tracker REST API built with **TypeScript**, **Express.js**, **PostgreSQL**, and **JWT Authentication**.  
+This project follows the Level-2 assignment requirements including modular architecture, raw SQL queries using `pg`, role-based authorization, and Vercel deployment support.
 
 ---
 
-**Live URL:**
+# Live API
 
-(set after deployment)
+https://assignment2-alpha-six.vercel.app
 
 ---
 
-**GitHub Repository:**
+# API Base URL
+
+https://assignment2-alpha-six.vercel.app/api
+
+---
+
+# GitHub Repository
 
 https://github.com/ALAMIN761740/LEVEL-02-Assignment-2
 
 ---
 
-**Features**
-- **Authentication:** Signup & Login with bcrypt-hashed passwords and JWTs.
-- **Role-based permissions:** `contributor` and `maintainer` roles enforced in business logic.
-- **Issue management:** Create, read, update, delete issues (raw SQL via `pool.query`).
-- **Global error handling, utilities, and TypeScript types.**
-- **Vercel-ready:** App exports the Express `app` for serverless deployment.
+# Features
+
+- JWT Authentication System
+- Password Hashing with bcrypt
+- Role-Based Authorization (`contributor`, `maintainer`)
+- Create, Read, Update, Delete Issues
+- Raw SQL Queries using PostgreSQL (`pg`)
+- Global Error Handling
+- Modular & Scalable Architecture
+- TypeScript Support
+- Vercel Deployment Ready
 
 ---
 
-**Tech Stack**
-- Node.js, TypeScript
+# Tech Stack
+
+- Node.js
+- TypeScript
 - Express.js
-- PostgreSQL (`pg` driver, raw SQL only)
-- JWT (`jsonwebtoken`), bcrypt
-- Vercel for deployment
+- PostgreSQL
+- pg
+- JWT (`jsonwebtoken`)
+- bcrypt
+- Vercel
 
 ---
 
-**Quick Start**
+# Quick Start
 
-1. Clone repository
+## 1. Clone Repository
 
 ```bash
 git clone https://github.com/ALAMIN761740/LEVEL-02-Assignment-2.git
+
 cd LEVEL-02-Assignment-2
 ```
 
-2. Install
+---
+
+## 2. Install Dependencies
 
 ```bash
 npm install
 ```
 
-3. Environment
+---
 
-Create a `.env` in the project root with at least:
+## 3. Configure Environment Variables
+
+Create a `.env` file in the project root:
 
 ```env
 PORT=5000
 
-# Either DATABASE_URL or CONNECTION_STRING is accepted by the app
-CONNECTION_STRING=postgresql://user:pass@host:port/dbname
+DATABASE_URL=postgresql://user:password@host:5432/dbname
 
 JWT_SECRET=your_jwt_secret
+
 JWT_REFRESH_SECRET=your_refresh_secret
 ```
 
-4. Run (development)
+---
+
+## 4. Run Development Server
 
 ```bash
 npm run dev
 ```
 
-5. Build / Start (production)
+---
+
+## 5. Build Project
 
 ```bash
 npm run build
+```
+
+---
+
+## 6. Start Production Server
+
+```bash
 npm start
 ```
 
 ---
 
-**Environment / Deployment Notes**
-- The app reads `DATABASE_URL` or `CONNECTION_STRING` (fallback) for PostgreSQL.
-- On Vercel: add environment variables in Project Settings — Vercel does not automatically read local `.env` files for production.
-- Required env vars: `DATABASE_URL` (or `CONNECTION_STRING`), `JWT_SECRET`, `JWT_REFRESH_SECRET`, `PORT` (optional).
+# Environment & Deployment Notes
+
+- The project supports both `DATABASE_URL` and `CONNECTION_STRING`
+- Vercel production deployments require environment variables manually added in project settings
+
+Required environment variables:
+
+```env
+DATABASE_URL
+JWT_SECRET
+JWT_REFRESH_SECRET
+PORT (optional)
+```
 
 ---
 
-**API Endpoints (summary)**
+# API Endpoints
 
-**Auth**
-- POST `/api/auth/signup` — Register user
-- POST `/api/auth/login` — Login, returns `{ token, user }`
+## Authentication Routes
 
-**Issues**
-- POST `/api/issues` — Create issue (authenticated)
-- GET `/api/issues` — Get all issues (supports `?sort=newest|oldest`, `?type=`, `?status=`)
-- GET `/api/issues/:id` — Get single issue
-- PATCH `/api/issues/:id` — Update issue (authenticated; role rules applied)
-- DELETE `/api/issues/:id` — Delete issue (authenticated; maintainer only)
+| Method | Endpoint | Description |
+|---|---|---|
+| POST | `/api/auth/signup` | Register a new user |
+| POST | `/api/auth/login` | Login user |
 
-All protected routes require the `Authorization` header with the raw JWT token (the middleware expects `req.headers.authorization` to contain the token string).
+---
 
-Example create issue request body:
+## Issue Routes
+
+| Method | Endpoint | Description |
+|---|---|---|
+| POST | `/api/issues` | Create issue (Protected) |
+| GET | `/api/issues` | Get all issues |
+| GET | `/api/issues/:id` | Get single issue |
+| PATCH | `/api/issues/:id` | Update issue (Protected) |
+| DELETE | `/api/issues/:id` | Delete issue (Maintainer only) |
+
+---
+
+# Live API Examples
+
+## Signup
+
+```http
+POST https://assignment2-alpha-six.vercel.app/api/auth/signup
+```
+
+---
+
+## Login
+
+```http
+POST https://assignment2-alpha-six.vercel.app/api/auth/login
+```
+
+---
+
+## Get All Issues
+
+```http
+GET https://assignment2-alpha-six.vercel.app/api/issues
+```
+
+---
+
+## Create Issue
+
+```http
+POST https://assignment2-alpha-six.vercel.app/api/issues
+```
+
+---
+
+# Authorization
+
+Protected routes require JWT token in request headers:
+
+```http
+Authorization: YOUR_JWT_TOKEN
+```
+
+---
+
+# Example Request Body
+
+## Create Issue
 
 ```json
 {
-	"title": "Bug: Login button fails",
-	"description": "When clicking the login button it returns 500 under load...",
-	"type": "bug"
+  "title": "Bug: Login button fails",
+  "description": "Server crashes when login button is clicked",
+  "type": "bug"
 }
 ```
 
-Example login response (200):
+---
+
+# Example Login Response
 
 ```json
 {
-	"success": true,
-	"message": "Login successful",
-	"data": {
-		"token": "<jwt>",
-		"user": { "id": 1, "name": "...", "role": "contributor" }
-	}
+  "success": true,
+  "message": "Login successful",
+  "data": {
+    "token": "<jwt-token>",
+    "user": {
+      "id": 1,
+      "name": "Al Amin",
+      "role": "contributor"
+    }
+  }
 }
 ```
 
 ---
 
-**API Examples (curl)**
+# cURL Examples
 
-- Signup:
-
-```bash
-curl -X POST http://localhost:5000/api/auth/signup \
- -H "Content-Type: application/json" \
- -d '{"name":"Alice","email":"alice@example.com","password":"secret"}'
-```
-
-- Login (returns `token`):
+## Signup
 
 ```bash
-curl -X POST http://localhost:5000/api/auth/login \
- -H "Content-Type: application/json" \
- -d '{"email":"alice@example.com","password":"secret"}'
-```
-
-- Get all issues (public):
-
-```bash
-curl http://localhost:5000/api/issues
-```
-
-- Create issue (authenticated):
-
-```bash
-curl -X POST http://localhost:5000/api/issues \
- -H "Content-Type: application/json" \
- -H "Authorization: <your-jwt-token>" \
- -d '{"title":"Bug: login","description":"Details...","type":"bug"}'
+curl -X POST https://assignment2-alpha-six.vercel.app/api/auth/signup \
+-H "Content-Type: application/json" \
+-d '{"name":"Alice","email":"alice@example.com","password":"123456"}'
 ```
 
 ---
 
-**Note on `catchAsync` and Global Error Handling**
+## Login
 
-- This project uses a small `catchAsync` higher-order helper and a `globalErrorHandler` middleware to centralize error handling for async controllers. Removing these patterns can cause unhandled promise rejections or server crashes when an async controller throws — keep them in place as a best practice.
-
-
----
-
-**Database Schema (summary)**
-- `users` table (created by `src/db/init.ts`):
-	- `id` SERIAL PRIMARY KEY
-	- `name` VARCHAR(100) NOT NULL
-	- `email` VARCHAR(100) UNIQUE NOT NULL
-	- `password` VARCHAR(255) NOT NULL
-	- `role` VARCHAR(20) DEFAULT 'contributor'
-	- `created_at`, `updated_at` TIMESTAMP
-- `issues` table (created by `src/db/init.ts`):
-	- `id` SERIAL PRIMARY KEY
-	- `title` VARCHAR(150) NOT NULL
-	- `description` TEXT NOT NULL
-	- `type` VARCHAR(30) NOT NULL
-	- `status` VARCHAR(30) DEFAULT 'open'
-	- `reporter_id` INT NOT NULL
-	- `created_at`, `updated_at` TIMESTAMP
-
-Design notes: queries are implemented using raw SQL via `pool.query` and reporter details are fetched via a secondary query (no joins required by the assignment).
+```bash
+curl -X POST https://assignment2-alpha-six.vercel.app/api/auth/login \
+-H "Content-Type: application/json" \
+-d '{"email":"alice@example.com","password":"123456"}'
+```
 
 ---
 
-**Project Structure**
+## Get All Issues
 
-See the main app and routes:
-- [src/app.ts](src/app.ts#L1-L200)
-- [src/server.ts](src/server.ts#L1-L200)
-- [src/config/index.ts](src/config/index.ts#L1-L40)
-- [src/db/init.ts](src/db/init.ts#L1-L200)
-- [src/modules/user](src/modules/user/user.route.ts#L1-L200)
-- [src/modules/issue](src/modules/issue/issue.route.ts#L1-L200)
+```bash
+curl https://assignment2-alpha-six.vercel.app/api/issues
+```
 
 ---
 
-**Assignment Checklist**
-- [x] Modular architecture with `modules/`, `utils/`, `middleware/`, `config/`
-- [x] Raw SQL only via `pg` pool
-- [x] JWT authentication and role checks implemented
-- [x] Passwords hashed with `bcrypt`
-- [x] DB init script creates required tables
-- [x] Endpoints match the assignment spec (paths and methods)
-- [x] Vercel deployment supported (exports `app` for serverless)
+## Create Issue
+
+```bash
+curl -X POST https://assignment2-alpha-six.vercel.app/api/issues \
+-H "Content-Type: application/json" \
+-H "Authorization: YOUR_JWT_TOKEN" \
+-d '{"title":"Bug","description":"Issue details","type":"bug"}'
+```
 
 ---
 
-**Next Steps / Recommendations**
-- Ensure Vercel environment variables are set (`DATABASE_URL` or `CONNECTION_STRING`, `JWT_SECRET`, `JWT_REFRESH_SECRET`).
-- Add input validation (e.g., via `express-validator`) for stronger request validation.
-- Add tests for auth and issue flows.
+# Postman Testing Guide
+
+## Authentication Flow
+
+1. Register using `/api/auth/signup`
+2. Login using `/api/auth/login`
+3. Copy returned JWT token
+4. Add token to Authorization header
+5. Test protected issue routes
 
 ---
 
-**Author**
+# Database Schema
 
-Al Amin — Level 2 Backend Assignment
+## users table
+
+| Column | Type |
+|---|---|
+| id | SERIAL PRIMARY KEY |
+| name | VARCHAR(100) |
+| email | VARCHAR(100) UNIQUE |
+| password | VARCHAR(255) |
+| role | VARCHAR(20) |
+| created_at | TIMESTAMP |
+| updated_at | TIMESTAMP |
 
 ---
 
-If you want, I can also:
-- add example `curl` or Postman collection for the main flows,
-- add `CONTRIBUTING.md` or expand the README with more examples.
+## issues table
 
+| Column | Type |
+|---|---|
+| id | SERIAL PRIMARY KEY |
+| title | VARCHAR(150) |
+| description | TEXT |
+| type | VARCHAR(30) |
+| status | VARCHAR(30) |
+| reporter_id | INT |
+| created_at | TIMESTAMP |
+| updated_at | TIMESTAMP |
+
+---
+
+# Project Structure
+
+```bash
+src/
+│
+├── config/
+├── db/
+├── middleware/
+├── modules/
+│   ├── auth/
+│   └── issue/
+├── utils/
+├── app.ts
+└── server.ts
+```
+
+---
+
+# Assignment Checklist
+
+- [x] Modular architecture
+- [x] Raw SQL queries
+- [x] PostgreSQL integration
+- [x] JWT authentication
+- [x] Role-based authorization
+- [x] Password hashing with bcrypt
+- [x] Global error handling
+- [x] Vercel deployment support
+- [x] TypeScript implementation
+
+---
+
+# Best Practices Used
+
+- `catchAsync` wrapper for async controllers
+- Centralized global error handler
+- Modular folder structure
+- Environment variable management
+- Clean and maintainable codebase
+
+---
+
+# Future Improvements
+
+- Request validation using `zod` or `express-validator`
+- Refresh token implementation
+- Unit and integration tests
+- Swagger API documentation
+- Rate limiting and security enhancements
+
+---
+
+# Author
+
+**Al Amin**  
+Level-2 Backend Assignment
+
+---
