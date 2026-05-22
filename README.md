@@ -6,7 +6,7 @@ A secure and scalable Issue Tracker REST API built with TypeScript, Express.js, 
 
 **Live URL:**
 
-https://assignment2-alpha-six.vercel.app
+(set after deployment)
 
 ---
 
@@ -125,6 +125,48 @@ Example login response (200):
 
 ---
 
+**API Examples (curl)**
+
+- Signup:
+
+```bash
+curl -X POST http://localhost:5000/api/auth/signup \
+ -H "Content-Type: application/json" \
+ -d '{"name":"Alice","email":"alice@example.com","password":"secret"}'
+```
+
+- Login (returns `token`):
+
+```bash
+curl -X POST http://localhost:5000/api/auth/login \
+ -H "Content-Type: application/json" \
+ -d '{"email":"alice@example.com","password":"secret"}'
+```
+
+- Get all issues (public):
+
+```bash
+curl http://localhost:5000/api/issues
+```
+
+- Create issue (authenticated):
+
+```bash
+curl -X POST http://localhost:5000/api/issues \
+ -H "Content-Type: application/json" \
+ -H "Authorization: <your-jwt-token>" \
+ -d '{"title":"Bug: login","description":"Details...","type":"bug"}'
+```
+
+---
+
+**Note on `catchAsync` and Global Error Handling**
+
+- This project uses a small `catchAsync` higher-order helper and a `globalErrorHandler` middleware to centralize error handling for async controllers. Removing these patterns can cause unhandled promise rejections or server crashes when an async controller throws — keep them in place as a best practice.
+
+
+---
+
 **Database Schema (summary)**
 - `users` table (created by `src/db/init.ts`):
 	- `id` SERIAL PRIMARY KEY
@@ -153,7 +195,7 @@ See the main app and routes:
 - [src/server.ts](src/server.ts#L1-L200)
 - [src/config/index.ts](src/config/index.ts#L1-L40)
 - [src/db/init.ts](src/db/init.ts#L1-L200)
-- [src/modules/auth](src/modules/auth/auth.route.ts#L1-L200)
+- [src/modules/user](src/modules/user/user.route.ts#L1-L200)
 - [src/modules/issue](src/modules/issue/issue.route.ts#L1-L200)
 
 ---

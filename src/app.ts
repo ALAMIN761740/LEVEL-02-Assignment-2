@@ -2,7 +2,7 @@ import express from "express";
 import cors from "cors";
 import { authRoutes } from "./modules/user/user.route";
 import { issueRoutes } from "./modules/issue/issue.route";
-// global error handler removed per instructions
+import { globalErrorHandler } from "./middleware/globalErrorHandler";
 
 
 
@@ -29,7 +29,7 @@ app.get("/", (req, res) => {
 
 app.use("/api/auth", authRoutes);
 app.use("/api/issues", issueRoutes);
-// global error handler removed
+app.use(globalErrorHandler);
 
 
 
